@@ -22,8 +22,6 @@ If you try Hostr, I ask you to report any bugs by answering a few questions in t
 
 ### [Open the Beta Testers Survey](https://docs.google.com/forms/d/e/1FAIpQLScb817Rfri17RVmvtgSvn-ZfyyZXaAr_RFoCriAb4hANGFAZA/viewform)
 
-Il feedback piu' utile include sistema operativo, DAW, risultato della scansione plugin, comportamento dei Parallel Split, crash, problemi di UI, plugin mancanti o drop-out audio.
-
 
 ## Features
 

@@ -44,8 +44,6 @@ Il feedback piu' utile include sistema operativo, DAW, risultato della scansione
 
 Hostr keeps the signal path compact: the master rack can hold plugins or Parallel Split modules, and each split can contain more chains, more plugins, and even another split.
 
-![Hostr Audio Flow](assets/AudioFlow.svg)
-
 ## Installation
 
 1. Download the installer for your operating system from the selected folders.

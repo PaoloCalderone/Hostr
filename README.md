@@ -11,10 +11,10 @@
 A JUCE audio rack for building serial chains, parallel splits, and nested routing inside a single insert, without multiplying buses and tracks in your DAW.
 ## Download Installer
 
-- [Download the latest release](https://github.com/PlugLynk/Hostr/releases/latest)
-- [macOS installer](Installers/MacOS/HostrMacOS.zip)
-- [Windows installer](Installers/Windows/HostrWindows.zip)
-- [Linux installer](Installers/Linux/HostrLinux.zip)
+- [Download the latest release](https://github.com/PaoloCalderone/Hostr/releases/tag/Hostr-v1.3.1)
+- [macOS installer](https://github.com/PaoloCalderone/Hostr/releases/download/Hostr-v1.3.1/HostrMacOS.zip)
+- [Windows installer](https://github.com/PaoloCalderone/Hostr/releases/download/Hostr-v1.3.1/HostrWindows.zip)
+- [Linux installer](https://github.com/PaoloCalderone/Hostr/releases/download/Hostr-v1.3.1/HostrLinux.zip)
 
 ## Sondaggio Beta Testers
 
@@ -49,9 +49,9 @@ Hostr keeps the signal path compact: the master rack can hold plugins or Paralle
 ## Installation
 
 1. Download the installer for your operating system from the selected folders.
-- [macOS installer](Installers/MacOS/HostrMacOS.zip)
-- [Windows installer](Installers/Windows/HostrWindows.zip)
-- [Linux installer](Installers/Linux/HostrLinux.zip)
+- [macOS installer](https://github.com/PaoloCalderone/Hostr/releases/download/Hostr-v1.3.1/HostrMacOS.zip)
+- [Windows installer](https://github.com/PaoloCalderone/Hostr/releases/download/Hostr-v1.3.1/HostrWindows.zip)
+- [Linux installer](https://github.com/PaoloCalderone/Hostr/releases/download/Hostr-v1.3.1/HostrLinux.zip)
 2. Close your DAW and any running audio plugin hosts.
 3. Run the installer for your operating system.
 4. Open your DAW and rescan plugins by selecting FULL RESCAN (CLEAR CACHE) from the menu.

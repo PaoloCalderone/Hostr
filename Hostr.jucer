@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<JUCERPROJECT id="fQneYU" name="Hostr" projectType="audioplug" useAppConfig="0"
+              jucerFormatVersion="1" pluginManufacturer="PlugLynk" pluginManufacturerCode="Plgl"
+              pluginCode="Plgl" pluginVST3Category="Fx,Tools">
+  <MAINGROUP id="vumZ15" name="Hostr">
+    <GROUP id="{526A6C65-84A2-8E21-E43D-F70CEB31840F}" name="Source">
+      <GROUP id="{8825F7C6-A8F7-CB81-A397-B7539C2166BB}" name="PRESET_MANAGER">
+        <FILE id="H923N8" name="PresetManager.cpp" compile="0" resource="0"
+              file="Source/PresetManager.cpp"/>
+        <FILE id="xNciJj" name="PresetManager.h" compile="0" resource="0" file="Source/PresetManager.h"/>
+      </GROUP>
+      <GROUP id="{C6E613C0-D027-F6FF-2D81-F748A4CD46B4}" name="PLUGIN_SEARCH_DIALOG">
+        <FILE id="szvA08" name="PluginSearchDialog.cpp" compile="0" resource="0"
+              file="Source/PluginSearchDialog.cpp"/>
+        <FILE id="tleUM5" name="PluginSearchDialog.h" compile="0" resource="0"
+              file="Source/PluginSearchDialog.h"/>
+      </GROUP>
+      <GROUP id="{5C2B6B8C-6B38-33E5-800D-E6307C7ABF43}" name="PARALLEL_SPLIT">
+        <FILE id="QFIPvS" name="ParallelSplitComponent.cpp" compile="0" resource="0"
+              file="Source/ParallelSplitComponent.cpp"/>
+        <FILE id="wsipfM" name="ParallelSplitComponent.h" compile="0" resource="0"
+              file="Source/ParallelSplitComponent.h"/>
+        <FILE id="urLKIV" name="ParallelSplitProcessor.cpp" compile="0" resource="0"
+              file="Source/ParallelSplitProcessor.cpp"/>
+        <FILE id="A0I2mx" name="ParallelSplitProcessor.h" compile="0" resource="0"
+              file="Source/ParallelSplitProcessor.h"/>
+      </GROUP>
+      <GROUP id="{BAD60DA3-47B8-AAD2-7467-A0F050918406}" name="CUSTOM_GUI">
+        <FILE id="l6tbL1" name="CustomLookAndFeel.h" compile="0" resource="0"
+              file="Source/CustomLookAndFeel.h"/>
+        <FILE id="Wr0gqP" name="CustomDocumentWindow.h" compile="0" resource="0"
+              file="Source/CustomDocumentWindow.h"/>
+        <FILE id="Sk1nP1" name="HostrSkin.h" compile="0" resource="0" file="Source/HostrSkin.h"/>
+      </GROUP>
+      <GROUP id="{E91C2B86-7B6F-4A18-9E1A-1F7D2B8F5A10}" name="SKIN_ASSETS">
+        <GROUP id="{E91C2B86-7B6F-4A18-9E1A-1F7D2B8F5A11}" name="modern-slate">
+          <FILE id="ms01" name="master-button-off.png" compile="0" resource="1"
+                file="assets/skins/modern-slate/master-button-off.png"/>
+          <FILE id="ms02" name="chain-minus.png" compile="0" resource="1" file="assets/skins/modern-slate/chain-minus.png"/>
+          <FILE id="ms03" name="master-strip-off.png" compile="0" resource="1"
+                file="assets/skins/modern-slate/master-strip-off.png"/>
+          <FILE id="ms04" name="macro-minus.png" compile="0" resource="1" file="assets/skins/modern-slate/macro-minus.png"/>
+          <FILE id="ms05" name="macro-plus.png" compile="0" resource="1" file="assets/skins/modern-slate/macro-plus.png"/>
+          <FILE id="ms06" name="master-button-on.png" compile="0" resource="1"
+                file="assets/skins/modern-slate/master-button-on.png"/>
+          <FILE id="ms07" name="chain-plus.png" compile="0" resource="1" file="assets/skins/modern-slate/chain-plus.png"/>
+          <FILE id="ms08" name="chain-s-off.png" compile="0" resource="1" file="assets/skins/modern-slate/chain-s-off.png"/>
+          <FILE id="ms09" name="strip-on.png" compile="0" resource="1" file="assets/skins/modern-slate/strip-on.png"/>
+          <FILE id="ms10" name="master-on.png" compile="0" resource="1" file="assets/skins/modern-slate/master-on.png"/>
+          <FILE id="ms11" name="chain-s-on.png" compile="0" resource="1" file="assets/skins/modern-slate/chain-s-on.png"/>
+          <FILE id="ms12" name="master-off.png" compile="0" resource="1" file="assets/skins/modern-slate/master-off.png"/>
+          <FILE id="ms13" name="macros-button-on.png" compile="0" resource="1"
+                file="assets/skins/modern-slate/macros-button-on.png"/>
+          <FILE id="ms14" name="macros-button-off.png" compile="0" resource="1"
+                file="assets/skins/modern-slate/macros-button-off.png"/>
+          <FILE id="ms15" name="strip-off.png" compile="0" resource="1" file="assets/skins/modern-slate/strip-off.png"/>
+          <FILE id="ms16" name="master-strip-on.png" compile="0" resource="1"
+                file="assets/skins/modern-slate/master-strip-on.png"/>
+        </GROUP>
+        <GROUP id="{E91C2B86-7B6F-4A18-9E1A-1F7D2B8F5A12}" name="black-flat">
+          <FILE id="bf01" name="master-button-off.png" compile="0" resource="1"
+                file="assets/skins/black-flat/master-button-off.png"/>
+          <FILE id="bf02" name="chain-minus.png" compile="0" resource="1" file="assets/skins/black-flat/chain-minus.png"/>
+          <FILE id="bf03" name="master-strip-off.png" compile="0" resource="1"
+                file="assets/skins/black-flat/master-strip-off.png"/>
+          <FILE id="bf04" name="macro-minus.png" compile="0" resource="1" file="assets/skins/black-flat/macro-minus.png"/>
+          <FILE id="bf05" name="macro-plus.png" compile="0" resource="1" file="assets/skins/black-flat/macro-plus.png"/>
+          <FILE id="bf06" name="master-button-on.png" compile="0" resource="1"
+                file="assets/skins/black-flat/master-button-on.png"/>
+          <FILE id="bf07" name="chain-plus.png" compile="0" resource="1" file="assets/skins/black-flat/chain-plus.png"/>
+          <FILE id="bf08" name="chain-s-off.png" compile="0" resource="1" file="assets/skins/black-flat/chain-s-off.png"/>
+          <FILE id="bf09" name="strip-on.png" compile="0" resource="1" file="assets/skins/black-flat/strip-on.png"/>
+          <FILE id="bf10" name="master-on.png" compile="0" resource="1" file="assets/skins/black-flat/master-on.png"/>
+          <FILE id="bf11" name="chain-s-on.png" compile="0" resource="1" file="assets/skins/black-flat/chain-s-on.png"/>
+          <FILE id="bf12" name="master-off.png" compile="0" resource="1" file="assets/skins/black-flat/master-off.png"/>
+          <FILE id="bf13" name="macros-button-on.png" compile="0" resource="1"
+                file="assets/skins/black-flat/macros-button-on.png"/>
+          <FILE id="bf14" name="macros-button-off.png" compile="0" resource="1"
+                file="assets/skins/black-flat/macros-button-off.png"/>
+          <FILE id="bf15" name="strip-off.png" compile="0" resource="1" file="assets/skins/black-flat/strip-off.png"/>
+          <FILE id="bf16" name="master-strip-on.png" compile="0" resource="1"
+                file="assets/skins/black-flat/master-strip-on.png"/>
+        </GROUP>
+        <GROUP id="{E91C2B86-7B6F-4A18-9E1A-1F7D2B8F5A13}" name="rack-blue">
+          <FILE id="rb01" name="master-button-off.png" compile="0" resource="1"
+                file="assets/skins/rack-blue/master-button-off.png"/>
+          <FILE id="rb02" name="chain-minus.png" compile="0" resource="1" file="assets/skins/rack-blue/chain-minus.png"/>
+          <FILE id="rb03" name="master-strip-off.png" compile="0" resource="1"
+                file="assets/skins/rack-blue/master-strip-off.png"/>
+          <FILE id="rb04" name="macro-minus.png" compile="0" resource="1" file="assets/skins/rack-blue/macro-minus.png"/>
+          <FILE id="rb05" name="macro-plus.png" compile="0" resource="1" file="assets/skins/rack-blue/macro-plus.png"/>
+          <FILE id="rb06" name="master-button-on.png" compile="0" resource="1"
+                file="assets/skins/rack-blue/master-button-on.png"/>
+          <FILE id="rb07" name="chain-plus.png" compile="0" resource="1" file="assets/skins/rack-blue/chain-plus.png"/>
+          <FILE id="rb08" name="chain-s-off.png" compile="0" resource="1" file="assets/skins/rack-blue/chain-s-off.png"/>
+          <FILE id="rb09" name="strip-on.png" compile="0" resource="1" file="assets/skins/rack-blue/strip-on.png"/>
+          <FILE id="rb10" name="master-on.png" compile="0" resource="1" file="assets/skins/rack-blue/master-on.png"/>
+          <FILE id="rb11" name="chain-s-on.png" compile="0" resource="1" file="assets/skins/rack-blue/chain-s-on.png"/>
+          <FILE id="rb12" name="master-off.png" compile="0" resource="1" file="assets/skins/rack-blue/master-off.png"/>
+          <FILE id="rb13" name="macros-button-on.png" compile="0" resource="1"
+                file="assets/skins/rack-blue/macros-button-on.png"/>
+          <FILE id="rb14" name="macros-button-off.png" compile="0" resource="1"
+                file="assets/skins/rack-blue/macros-button-off.png"/>
+          <FILE id="rb15" name="strip-off.png" compile="0" resource="1" file="assets/skins/rack-blue/strip-off.png"/>
+          <FILE id="rb16" name="master-strip-on.png" compile="0" resource="1"
+                file="assets/skins/rack-blue/master-strip-on.png"/>
+        </GROUP>
+        <GROUP id="{E91C2B86-7B6F-4A18-9E1A-1F7D2B8F5A14}" name="studio-3d">
+          <FILE id="s301" name="knob-source.png" compile="0" resource="1" file="assets/skins/studio-3d/knob-source.png"/>
+          <FILE id="s302" name="knob.png" compile="0" resource="1" file="assets/skins/studio-3d/knob.png"/>
+          <FILE id="s303" name="panel-surface.png" compile="0" resource="1" file="assets/skins/studio-3d/panel-surface.png"/>
+        </GROUP>
+        <GROUP id="{E91C2B86-7B6F-4A18-9E1A-1F7D2B8F5A15}" name="vintage-amber">
+          <FILE id="va01" name="master-button-off.png" compile="0" resource="1"
+                file="assets/skins/vintage-amber/master-button-off.png"/>
+          <FILE id="va02" name="chain-minus.png" compile="0" resource="1" file="assets/skins/vintage-amber/chain-minus.png"/>
+          <FILE id="va03" name="master-strip-off.png" compile="0" resource="1"
+                file="assets/skins/vintage-amber/master-strip-off.png"/>
+          <FILE id="va04" name="macro-minus.png" compile="0" resource="1" file="assets/skins/vintage-amber/macro-minus.png"/>
+          <FILE id="va05" name="macro-plus.png" compile="0" resource="1" file="assets/skins/vintage-amber/macro-plus.png"/>
+          <FILE id="va06" name="master-button-on.png" compile="0" resource="1"
+                file="assets/skins/vintage-amber/master-button-on.png"/>
+          <FILE id="va07" name="chain-plus.png" compile="0" resource="1" file="assets/skins/vintage-amber/chain-plus.png"/>
+          <FILE id="va08" name="chain-s-off.png" compile="0" resource="1" file="assets/skins/vintage-amber/chain-s-off.png"/>
+          <FILE id="va09" name="strip-on.png" compile="0" resource="1" file="assets/skins/vintage-amber/strip-on.png"/>
+          <FILE id="va10" name="master-on.png" compile="0" resource="1" file="assets/skins/vintage-amber/master-on.png"/>
+          <FILE id="va11" name="chain-s-on.png" compile="0" resource="1" file="assets/skins/vintage-amber/chain-s-on.png"/>
+          <FILE id="va12" name="master-off.png" compile="0" resource="1" file="assets/skins/vintage-amber/master-off.png"/>
+          <FILE id="va13" name="macros-button-on.png" compile="0" resource="1"
+                file="assets/skins/vintage-amber/macros-button-on.png"/>
+          <FILE id="va14" name="macros-button-off.png" compile="0" resource="1"
+                file="assets/skins/vintage-amber/macros-button-off.png"/>
+          <FILE id="va15" name="strip-off.png" compile="0" resource="1" file="assets/skins/vintage-amber/strip-off.png"/>
+          <FILE id="va16" name="master-strip-on.png" compile="0" resource="1"
+                file="assets/skins/vintage-amber/master-strip-on.png"/>
+        </GROUP>
+        <GROUP id="{E91C2B86-7B6F-4A18-9E1A-1F7D2B8F5A16}" name="api-500">
+          <FILE id="a501" name="master-button-off.png" compile="0" resource="1"
+                file="assets/skins/api-500/master-button-off.png"/>
+          <FILE id="a502" name="chain-minus.png" compile="0" resource="1" file="assets/skins/api-500/chain-minus.png"/>
+          <FILE id="a503" name="master-strip-off.png" compile="0" resource="1"
+                file="assets/skins/api-500/master-strip-off.png"/>
+          <FILE id="a504" name="macro-minus.png" compile="0" resource="1" file="assets/skins/api-500/macro-minus.png"/>
+          <FILE id="a505" name="macro-plus.png" compile="0" resource="1" file="assets/skins/api-500/macro-plus.png"/>
+          <FILE id="a506" name="master-button-on.png" compile="0" resource="1"
+                file="assets/skins/api-500/master-button-on.png"/>
+          <FILE id="a507" name="chain-plus.png" compile="0" resource="1" file="assets/skins/api-500/chain-plus.png"/>
+          <FILE id="a508" name="knob-source.png" compile="0" resource="1" file="assets/skins/api-500/knob-source.png"/>
+          <FILE id="a509" name="chain-s-off.png" compile="0" resource="1" file="assets/skins/api-500/chain-s-off.png"/>
+          <FILE id="a510" name="strip-on.png" compile="0" resource="1" file="assets/skins/api-500/strip-on.png"/>
+          <FILE id="a511" name="knob.png" compile="0" resource="1" file="assets/skins/api-500/knob.png"/>
+          <FILE id="a512" name="master-on.png" compile="0" resource="1" file="assets/skins/api-500/master-on.png"/>
+          <FILE id="a513" name="chain-s-on.png" compile="0" resource="1" file="assets/skins/api-500/chain-s-on.png"/>
+          <FILE id="a514" name="master-off.png" compile="0" resource="1" file="assets/skins/api-500/master-off.png"/>
+          <FILE id="a515" name="macros-button-on.png" compile="0" resource="1"
+                file="assets/skins/api-500/macros-button-on.png"/>
+          <FILE id="a516" name="panel-surface.png" compile="0" resource="1" file="assets/skins/api-500/panel-surface.png"/>
+          <FILE id="a517" name="macros-button-off.png" compile="0" resource="1"
+                file="assets/skins/api-500/macros-button-off.png"/>
+          <FILE id="a518" name="strip-off.png" compile="0" resource="1" file="assets/skins/api-500/strip-off.png"/>
+          <FILE id="a519" name="master-strip-on.png" compile="0" resource="1"
+                file="assets/skins/api-500/master-strip-on.png"/>
+        </GROUP>
+        <GROUP id="{E91C2B86-7B6F-4A18-9E1A-1F7D2B8F5A17}" name="neve-console">
+          <FILE id="nc01" name="master-button-off.png" compile="0" resource="1"
+                file="assets/skins/neve-console/master-button-off.png"/>
+          <FILE id="nc02" name="chain-minus.png" compile="0" resource="1" file="assets/skins/neve-console/chain-minus.png"/>
+          <FILE id="nc03" name="master-strip-off.png" compile="0" resource="1"
+                file="assets/skins/neve-console/master-strip-off.png"/>
+          <FILE id="nc04" name="macro-minus.png" compile="0" resource="1" file="assets/skins/neve-console/macro-minus.png"/>
+          <FILE id="nc05" name="macro-plus.png" compile="0" resource="1" file="assets/skins/neve-console/macro-plus.png"/>
+          <FILE id="nc06" name="master-button-on.png" compile="0" resource="1"
+                file="assets/skins/neve-console/master-button-on.png"/>
+          <FILE id="nc07" name="chain-plus.png" compile="0" resource="1" file="assets/skins/neve-console/chain-plus.png"/>
+          <FILE id="nc08" name="knob-source.png" compile="0" resource="1" file="assets/skins/neve-console/knob-source.png"/>
+          <FILE id="nc09" name="chain-s-off.png" compile="0" resource="1" file="assets/skins/neve-console/chain-s-off.png"/>
+          <FILE id="nc10" name="strip-on.png" compile="0" resource="1" file="assets/skins/neve-console/strip-on.png"/>
+          <FILE id="nc11" name="knob.png" compile="0" resource="1" file="assets/skins/neve-console/knob.png"/>
+          <FILE id="nc12" name="master-on.png" compile="0" resource="1" file="assets/skins/neve-console/master-on.png"/>
+          <FILE id="nc13" name="chain-s-on.png" compile="0" resource="1" file="assets/skins/neve-console/chain-s-on.png"/>
+          <FILE id="nc14" name="master-off.png" compile="0" resource="1" file="assets/skins/neve-console/master-off.png"/>
+          <FILE id="nc15" name="macros-button-on.png" compile="0" resource="1"
+                file="assets/skins/neve-console/macros-button-on.png"/>
+          <FILE id="nc16" name="panel-surface.png" compile="0" resource="1" file="assets/skins/neve-console/panel-surface.png"/>
+          <FILE id="nc17" name="macros-button-off.png" compile="0" resource="1"
+                file="assets/skins/neve-console/macros-button-off.png"/>
+          <FILE id="nc18" name="strip-off.png" compile="0" resource="1" file="assets/skins/neve-console/strip-off.png"/>
+          <FILE id="nc19" name="master-strip-on.png" compile="0" resource="1"
+                file="assets/skins/neve-console/master-strip-on.png"/>
+        </GROUP>
+        <GROUP id="{E91C2B86-7B6F-4A18-9E1A-1F7D2B8F5A18}" name="black-rack">
+          <FILE id="br01" name="panel-surface.png" compile="0" resource="1" file="assets/skins/black-rack/panel-surface.png"/>
+          <FILE id="br02" name="macros-button-off.png" compile="0" resource="1"
+                file="assets/skins/black-rack/macros-button-off.png"/>
+          <FILE id="br03" name="strip-off.png" compile="0" resource="1" file="assets/skins/black-rack/strip-off.png"/>
+          <FILE id="br04" name="master-strip-on.png" compile="0" resource="1"
+                file="assets/skins/black-rack/master-strip-on.png"/>
+          <FILE id="br05" name="master-off.png" compile="0" resource="1" file="assets/skins/black-rack/master-off.png"/>
+          <FILE id="br06" name="macros-button-on.png" compile="0" resource="1"
+                file="assets/skins/black-rack/macros-button-on.png"/>
+          <FILE id="br07" name="chain-s-on.png" compile="0" resource="1" file="assets/skins/black-rack/chain-s-on.png"/>
+          <FILE id="br08" name="master-on.png" compile="0" resource="1" file="assets/skins/black-rack/master-on.png"/>
+          <FILE id="br09" name="master-button-off.png" compile="0" resource="1"
+                file="assets/skins/black-rack/master-button-off.png"/>
+          <FILE id="br10" name="chain-minus.png" compile="0" resource="1" file="assets/skins/black-rack/chain-minus.png"/>
+          <FILE id="br11" name="master-strip-off.png" compile="0" resource="1"
+                file="assets/skins/black-rack/master-strip-off.png"/>
+          <FILE id="br12" name="macro-minus.png" compile="0" resource="1" file="assets/skins/black-rack/macro-minus.png"/>
+          <FILE id="br13" name="macro-plus.png" compile="0" resource="1" file="assets/skins/black-rack/macro-plus.png"/>
+          <FILE id="br14" name="master-button-on.png" compile="0" resource="1"
+                file="assets/skins/black-rack/master-button-on.png"/>
+          <FILE id="br15" name="chain-plus.png" compile="0" resource="1" file="assets/skins/black-rack/chain-plus.png"/>
+          <FILE id="br16" name="knob-source.png" compile="0" resource="1" file="assets/skins/black-rack/knob-source.png"/>
+          <FILE id="br17" name="chain-s-off.png" compile="0" resource="1" file="assets/skins/black-rack/chain-s-off.png"/>
+          <FILE id="br18" name="strip-on.png" compile="0" resource="1" file="assets/skins/black-rack/strip-on.png"/>
+          <FILE id="br19" name="knob.png" compile="0" resource="1" file="assets/skins/black-rack/knob.png"/>
+        </GROUP>
+      </GROUP>
+      <FILE id="vccxUc" name="PluginProcessor.cpp" compile="1" resource="0"
+            file="Source/PluginProcessor.cpp"/>
+      <FILE id="Eyzt5J" name="PluginProcessor.h" compile="0" resource="0"
+            file="Source/PluginProcessor.h"/>
+      <FILE id="RQUul7" name="PluginEditor.cpp" compile="1" resource="0"
+            file="Source/PluginEditor.cpp"/>
+      <FILE id="WyhhG2" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
+    </GROUP>
+  </MAINGROUP>
+  <MODULES>
+    <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_devices" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_formats" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_plugin_client" showAllCode="1" useLocalCopy="0"
+            useGlobalPath="1"/>
+    <MODULE id="juce_audio_processors" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_utils" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_core" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_data_structures" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_events" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_graphics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_gui_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_gui_extra" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+  </MODULES>
+  <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"
+               JUCE_PLUGINHOST_VST="1" JUCE_PLUGINHOST_VST3="1" JUCE_PLUGINHOST_AU="1"/>
+  <EXPORTFORMATS>
+    <XCODE_MAC targetFolder="Builds/MacOSX" vstLegacyFolder="ThirdParty/VST2_SDK">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="1" name="Debug" targetName="Hostr"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="Hostr"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_audio_basics" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_plugin_client" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../../../JUCE/modules"/>
+      </MODULEPATHS>
+    </XCODE_MAC>
+    <VS2022 targetFolder="Builds/VisualStudio2022" vstLegacyFolder="ThirdParty/VST2_SDK">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="1" name="Debug" targetName="Hostr" winArchitecture="x64"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="Hostr" winArchitecture="x64"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_audio_basics" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_plugin_client" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../../../JUCE/modules"/>
+      </MODULEPATHS>
+    </VS2022>
+    <LINUX_MAKE targetFolder="Builds/LinuxMakefile" vstLegacyFolder="ThirdParty/VST2_SDK">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="1" name="Debug" targetName="Hostr"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="Hostr"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_audio_basics" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_plugin_client" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../../../JUCE/modules"/>
+      </MODULEPATHS>
+    </LINUX_MAKE>
+  </EXPORTFORMATS>
+</JUCERPROJECT>

@@ -279,7 +279,7 @@ private:
     PluginProcessor& processor;
 
     PaintlessTextButton optionsBtn;
-    PaintlessTextButton abAButton, abBButton;
+    PaintlessTextButton abToggleButton;
     PaintlessTextButton undoBtn, redoBtn;
     PaintlessTextButton presetMenuBtn, prevPresetBtn, nextPresetBtn;
     PaintlessTextButton loadBtn, saveBtn, saveAsBtn;
@@ -293,8 +293,10 @@ private:
     void loadNextPreset();
     void showPresetMenu();
     void selectABSlot(bool useA);
+    void toggleABSlot();
     void copyABSlot(bool copyAToB);
     void swapABSlots();
+    void syncABCacheToProcessor();
     void timerCallback() override;
     void drawSegmentButton(juce::Graphics& g, const juce::Button& button,
                            const juce::String& text, bool enabled = true,

@@ -159,6 +159,9 @@ public:
     std::atomic<float> inputGain    { 0.0f };
     std::atomic<float> editorZoomScale { 1.25f };
     std::atomic<int>   editorSkinIndex { 0 };
+    juce::String abSnapshotA;
+    juce::String abSnapshotB;
+    bool activeABSlotIsA = true;
 
     juce::AudioParameterFloat* getMacroParameter(int index) const;
     float getMacroValue(int index) const;

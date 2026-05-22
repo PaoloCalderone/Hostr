@@ -1493,11 +1493,8 @@ PresetBarComponent::PresetBarComponent(PluginProcessor& p) : processor(p)
     setupButton(optionsBtn, {}, "Options");
     optionsBtn.onClick = [this] { if (onOptionsMenu) onOptionsMenu(); };
 
-    setupButton(abAButton, "A", "Recall A");
-    abAButton.onClick = [this] { selectABSlot(true); };
-
-    setupButton(abBButton, "B", "Recall B");
-    abBButton.onClick = [this] { selectABSlot(false); };
+    setupButton(abToggleButton, "A", "Toggle A/B");
+    abToggleButton.onClick = [this] { toggleABSlot(); };
 
     setupButton(undoBtn, "UNDO", "Undo");
     undoBtn.onClick = [this] { doUndo(); };
@@ -1525,8 +1522,11 @@ PresetBarComponent::PresetBarComponent(PluginProcessor& p) : processor(p)
 
     refreshSkinColours();
     currentSnapshot = captureSnapshot();
-    abSnapshotA = currentSnapshot;
-    abSnapshotB = currentSnapshot;
+    abSnapshotA = processor.abSnapshotA.isNotEmpty() ? processor.abSnapshotA : currentSnapshot;
+    abSnapshotB = processor.abSnapshotB.isNotEmpty() ? processor.abSnapshotB : currentSnapshot;
+    activeABSlotIsA = processor.activeABSlotIsA;
+    abToggleButton.setButtonText(activeABSlotIsA ? "A" : "B");
+    syncABCacheToProcessor();
     startTimerHz(1);
 }
 
@@ -1539,8 +1539,7 @@ void PresetBarComponent::paint(juce::Graphics& g)
 
     if (optionsBtn.isVisible())
         drawSegmentButton(g, optionsBtn, {}, true, true);
-    drawSegmentButton(g, abAButton, "A", true);
-    drawSegmentButton(g, abBButton, "B", true);
+    drawSegmentButton(g, abToggleButton, activeABSlotIsA ? "A" : "B", true);
     if (undoBtn.isVisible())
         drawSegmentButton(g, undoBtn, "UNDO", !undoStack.empty());
     if (redoBtn.isVisible())
@@ -1558,8 +1557,8 @@ void PresetBarComponent::paint(juce::Graphics& g)
         drawSegmentButton(g, saveAsBtn, "SAVE AS");
 
     auto nameBounds = getLocalBounds().reduced(6, 2);
-    nameBounds.setLeft(abAButton.getRight() + 6);
-    nameBounds.setRight(abBButton.getX() - 6);
+    nameBounds.setLeft((undoBtn.isVisible() ? redoBtn.getRight() : abToggleButton.getRight()) + 6);
+    nameBounds.setRight((prevPresetBtn.isVisible() ? prevPresetBtn : presetMenuBtn).getX() - 6);
 
     if (nameBounds.getWidth() > 6 && processor.presetManager)
     {
@@ -1572,7 +1571,7 @@ void PresetBarComponent::paint(juce::Graphics& g)
         g.drawFittedText(presetName.toUpperCase(), nameBounds, juce::Justification::centred, 1, 0.35f);
     }
 
-    const auto activeBounds = (activeABSlotIsA ? abAButton : abBButton).getBounds().reduced(2).toFloat();
+    const auto activeBounds = abToggleButton.getBounds().reduced(2).toFloat();
     g.setColour(skin.accent.withAlpha(0.72f));
     g.drawRect(activeBounds.toNearestInt(), juce::jmax(1, juce::roundToInt((float)getHeight() * 0.05f)));
 }
@@ -1605,10 +1604,11 @@ void PresetBarComponent::resized()
     const int arrowW = juce::jmax(18, juce::roundToInt((float)h * 1.02f));
     const int minPresetNameW = juce::jmax(82, juce::roundToInt((float)h * 4.8f));
     const int saveAsW = juce::jmax(50, juce::roundToInt((float)h * 2.55f));
-    const int fullControlsW = iconW + abW * 2 + textW * 4 + saveAsW + presetW + arrowW * 2;
+    const int fullControlsW = iconW + abW + textW * 4 + saveAsW + presetW + arrowW * 2;
     compactPresetActions = b.getWidth() < fullControlsW + minPresetNameW;
 
     optionsBtn.setBounds(b.removeFromLeft(iconW));
+    abToggleButton.setBounds(b.removeFromLeft(abW));
     undoBtn.setVisible(!compactPresetActions);
     redoBtn.setVisible(!compactPresetActions);
     prevPresetBtn.setVisible(!compactPresetActions);
@@ -1625,8 +1625,6 @@ void PresetBarComponent::resized()
         undoBtn.setBounds(b.removeFromLeft(textW));
         redoBtn.setBounds(b.removeFromLeft(textW));
     }
-
-    abAButton.setBounds(b.removeFromLeft(abW));
 
     if (!compactPresetActions)
     {
@@ -1648,7 +1646,6 @@ void PresetBarComponent::resized()
         presetMenuBtn.setBounds(b.removeFromRight(iconW));
     }
 
-    abBButton.setBounds(b.removeFromRight(abW));
 }
 
 void PresetBarComponent::drawSegmentButton(juce::Graphics& g, const juce::Button& button,
@@ -1743,6 +1740,7 @@ void PresetBarComponent::recordStateIfChanged()
             abSnapshotA = snapshot;
         else
             abSnapshotB = snapshot;
+        syncABCacheToProcessor();
         return;
     }
 
@@ -1758,6 +1756,7 @@ void PresetBarComponent::recordStateIfChanged()
         else
             abSnapshotB = snapshot;
         redoStack.clear();
+        syncABCacheToProcessor();
         repaint();
     }
 }
@@ -1790,6 +1789,7 @@ void PresetBarComponent::applySnapshot(const juce::String& snapshot)
             abSnapshotA = snapshot;
         else
             abSnapshotB = snapshot;
+        syncABCacheToProcessor();
         refreshLabel();
         if (auto* pe = findParentComponentOfClass<PluginEditor>())
         {
@@ -1807,6 +1807,12 @@ void PresetBarComponent::applySnapshot(const juce::String& snapshot)
 
 void PresetBarComponent::selectABSlot(bool useA)
 {
+    if (activeABSlotIsA == useA)
+    {
+        repaint();
+        return;
+    }
+
     recordStateIfChanged();
     if (currentSnapshot.isNotEmpty())
     {
@@ -1817,6 +1823,7 @@ void PresetBarComponent::selectABSlot(bool useA)
     }
 
     activeABSlotIsA = useA;
+    abToggleButton.setButtonText(activeABSlotIsA ? "A" : "B");
     const auto& target = useA ? abSnapshotA : abSnapshotB;
     if (target.isNotEmpty())
         applySnapshot(target);
@@ -1829,7 +1836,13 @@ void PresetBarComponent::selectABSlot(bool useA)
             abSnapshotB = currentSnapshot;
     }
 
+    syncABCacheToProcessor();
     repaint();
+}
+
+void PresetBarComponent::toggleABSlot()
+{
+    selectABSlot(!activeABSlotIsA);
 }
 
 void PresetBarComponent::copyABSlot(bool copyAToB)
@@ -1848,6 +1861,7 @@ void PresetBarComponent::copyABSlot(bool copyAToB)
     else
         abSnapshotA = abSnapshotB;
 
+    syncABCacheToProcessor();
     repaint();
 }
 
@@ -1856,7 +1870,16 @@ void PresetBarComponent::swapABSlots()
     recordStateIfChanged();
     std::swap(abSnapshotA, abSnapshotB);
     activeABSlotIsA = !activeABSlotIsA;
+    abToggleButton.setButtonText(activeABSlotIsA ? "A" : "B");
+    syncABCacheToProcessor();
     repaint();
+}
+
+void PresetBarComponent::syncABCacheToProcessor()
+{
+    processor.abSnapshotA = abSnapshotA;
+    processor.abSnapshotB = abSnapshotB;
+    processor.activeABSlotIsA = activeABSlotIsA;
 }
 
 void PresetBarComponent::doSave()
@@ -1938,6 +1961,11 @@ void PresetBarComponent::doLoad()
                         undoStack.erase(undoStack.begin());
                 }
                 currentSnapshot = captureSnapshot();
+                if (activeABSlotIsA)
+                    abSnapshotA = currentSnapshot;
+                else
+                    abSnapshotB = currentSnapshot;
+                syncABCacheToProcessor();
                 redoStack.clear();
                 refreshLabel();
                 if (auto* pe = findParentComponentOfClass<PluginEditor>())
@@ -1953,12 +1981,12 @@ void PresetBarComponent::doLoad()
             }
             else if (!cancelled)
             {
-                // Errore reale (file non parsabile o apply fallita) — mostra messaggio
+                // Real error (not parsable or apply failed) — mostra messaggio
                 juce::AlertWindow::showMessageBoxAsync(
                     juce::AlertWindow::WarningIcon, "Error",
                     "Unable to load the preset.", "OK");
             }
-            // Se cancelled == true l'utente ha premuto Annulla: nessun messaggio
+            // If cancelled == true the user pressed Cancel: no message
         });
 }
 
@@ -2018,6 +2046,11 @@ void PresetBarComponent::loadPresetFileAsync(const juce::File& fileToLoad)
         if (self.processor.presetManager->applyPresetXml(*xml))
         {
             self.currentSnapshot = self.captureSnapshot();
+            if (self.activeABSlotIsA)
+                self.abSnapshotA = self.currentSnapshot;
+            else
+                self.abSnapshotB = self.currentSnapshot;
+            self.syncABCacheToProcessor();
             self.redoStack.clear();
             self.refreshLabel();
             if (auto* pe = self.findParentComponentOfClass<PluginEditor>())
@@ -2094,7 +2127,7 @@ void PresetBarComponent::showPresetMenu()
     menu.addItem(10, "Swap A/B");
     menu.addSeparator();
 
-    // Elenca i preset salvati nella cartella
+    // Enumerate the presets saved in the folder
     auto presetFiles = getPresetFiles();
 
     if (!presetFiles.empty())
@@ -2144,9 +2177,6 @@ void PresetBarComponent::showPresetMenu()
                     {
                         if (r != 1 || !processor.presetManager) return;
 
-                        // callAsync: la ModalCallbackFunction viene chiamata
-                        // mentre l'AlertWindow sta ancora chiudendo — differire
-                        // per evitare distruzione di componenti a stack aperto.
                         juce::Component::SafePointer<PresetBarComponent> safeThis(this);
                         juce::MessageManager::callAsync([safeThis]()
                         {
@@ -2239,7 +2269,7 @@ PluginEditor::PluginEditor(PluginProcessor& p)
     zoomLevel = snapToMenuZoom(processor.getEditorZoomScale());
     processor.setEditorZoomScale(zoomLevel);
 
-    // Preset bar — contiene MENU + nome + Save + Load + ▼ tutti in una riga
+    // Preset bar — contains MENU + name + Save + Load + ▼
     presetBar = std::make_unique<PresetBarComponent>(p);
     presetBar->onOptionsMenu = [this]() { showOptionsMenu(); };
     addAndMakeVisible(*presetBar);
@@ -2348,7 +2378,6 @@ PluginEditor::PluginEditor(PluginProcessor& p)
 
     // The text is updated by refreshAllSlots() → syncPresetName()
     // Bypasses the entire master chain (all plugins in series and split chains).
-    // Appears as a blue/gray dot in the top left of the header
     addAndMakeVisible(masterBypassBtn);
     masterBypassBtn.setClickingTogglesState(true);
     masterBypassBtn.setColour(juce::TextButton::buttonColourId,   juce::Colours::transparentBlack);
@@ -2444,10 +2473,8 @@ PluginEditor::PluginEditor(PluginProcessor& p)
         };
     }
 
-    updateResizeLimits(false);
-    auto initialSize = getSizeForScale(false, zoomLevel);
-    setSize(initialSize.getWidth(), initialSize.getHeight());
     refreshAllSlots();
+    refreshParallelLayoutNow();
 
     if (const auto recoveryMessage = processor.getPendingScanRecoveryMessage(); recoveryMessage.isNotEmpty())
     {
@@ -2486,10 +2513,6 @@ PluginEditor::~PluginEditor()
     dragGhost.reset();
     presetBar.reset();
 }
-
-// ------------------------------------------------------------------------------
-
-
 
 void PluginEditor::updateMacroAssignmentMode()
 {

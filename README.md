@@ -46,7 +46,9 @@ Hostr keeps the signal path compact: the master rack can hold plugins or Paralle
 ## Installation
 
 1. Download the installer for your operating system from the selected folders.
-- [macOS installer](https://github.com/PaoloCalderone/Hostr/releases/download/Hostr-v1.3.1/HostrMacOS.zip)
+- [Download the latest release](https://github.com/PaoloCalderone/Hostr/releases/tag/Hostr-v1.3.1)
+- [macOS Arm installer](https://github.com/PaoloCalderone/Hostr/releases/download/Hostr-v1.3.1/Hostr-MacOS-Arm.zip)
+- [macOS Intel installer](https://github.com/PaoloCalderone/Hostr/releases/download/Hostr-v1.3.1/Hostr-MacOS-Intel.zip)
 - [Windows installer](https://github.com/PaoloCalderone/Hostr/releases/download/Hostr-v1.3.1/HostrWindows.zip)
 - [Linux installer](https://github.com/PaoloCalderone/Hostr/releases/download/Hostr-v1.3.1/HostrLinux.zip)
 2. Close your DAW and any running audio plugin hosts.

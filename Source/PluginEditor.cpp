@@ -1782,7 +1782,8 @@ void PresetBarComponent::applySnapshot(const juce::String& snapshot)
         return;
 
     suppressNextSnapshot = true;
-    if (processor.presetManager->applyPresetXml(*xml))
+    const bool appliedInPlace = processor.presetManager->applyPresetXmlInPlaceIfCompatible(*xml);
+    if (appliedInPlace || processor.presetManager->applyPresetXml(*xml))
     {
         currentSnapshot = snapshot;
         if (activeABSlotIsA)
@@ -1791,15 +1792,18 @@ void PresetBarComponent::applySnapshot(const juce::String& snapshot)
             abSnapshotB = snapshot;
         syncABCacheToProcessor();
         refreshLabel();
-        if (auto* pe = findParentComponentOfClass<PluginEditor>())
+        if (!appliedInPlace)
         {
-            pe->refreshAllSlots();
-            pe->scheduleLayoutUpdate();
-            juce::Component::SafePointer<PluginEditor> safeEd(pe);
-            juce::MessageManager::callAsync([safeEd]()
+            if (auto* pe = findParentComponentOfClass<PluginEditor>())
             {
-                if (safeEd) safeEd->syncAllParallelPanels();
-            });
+                pe->refreshAllSlots();
+                pe->scheduleLayoutUpdate();
+                juce::Component::SafePointer<PluginEditor> safeEd(pe);
+                juce::MessageManager::callAsync([safeEd]()
+                {
+                    if (safeEd) safeEd->syncAllParallelPanels();
+                });
+            }
         }
     }
     repaint();
@@ -1981,12 +1985,12 @@ void PresetBarComponent::doLoad()
             }
             else if (!cancelled)
             {
-                // Real error (not parsable or apply failed) — mostra messaggio
+                // Errore reale (file non parsabile o apply fallita) — mostra messaggio
                 juce::AlertWindow::showMessageBoxAsync(
                     juce::AlertWindow::WarningIcon, "Error",
                     "Unable to load the preset.", "OK");
             }
-            // If cancelled == true the user pressed Cancel: no message
+            // Se cancelled == true l'utente ha premuto Annulla: nessun messaggio
         });
 }
 
@@ -2127,7 +2131,7 @@ void PresetBarComponent::showPresetMenu()
     menu.addItem(10, "Swap A/B");
     menu.addSeparator();
 
-    // Enumerate the presets saved in the folder
+    // Elenca i preset salvati nella cartella
     auto presetFiles = getPresetFiles();
 
     if (!presetFiles.empty())
@@ -2177,6 +2181,9 @@ void PresetBarComponent::showPresetMenu()
                     {
                         if (r != 1 || !processor.presetManager) return;
 
+                        // callAsync: la ModalCallbackFunction viene chiamata
+                        // mentre l'AlertWindow sta ancora chiudendo — differire
+                        // per evitare distruzione di componenti a stack aperto.
                         juce::Component::SafePointer<PresetBarComponent> safeThis(this);
                         juce::MessageManager::callAsync([safeThis]()
                         {
@@ -2269,7 +2276,7 @@ PluginEditor::PluginEditor(PluginProcessor& p)
     zoomLevel = snapToMenuZoom(processor.getEditorZoomScale());
     processor.setEditorZoomScale(zoomLevel);
 
-    // Preset bar — contains MENU + name + Save + Load + ▼
+    // Preset bar — contiene MENU + nome + Save + Load + ▼ tutti in una riga
     presetBar = std::make_unique<PresetBarComponent>(p);
     presetBar->onOptionsMenu = [this]() { showOptionsMenu(); };
     addAndMakeVisible(*presetBar);
@@ -2378,6 +2385,7 @@ PluginEditor::PluginEditor(PluginProcessor& p)
 
     // The text is updated by refreshAllSlots() → syncPresetName()
     // Bypasses the entire master chain (all plugins in series and split chains).
+    // Appears as a blue/gray dot in the top left of the header
     addAndMakeVisible(masterBypassBtn);
     masterBypassBtn.setClickingTogglesState(true);
     masterBypassBtn.setColour(juce::TextButton::buttonColourId,   juce::Colours::transparentBlack);
@@ -2513,6 +2521,10 @@ PluginEditor::~PluginEditor()
     dragGhost.reset();
     presetBar.reset();
 }
+
+// ------------------------------------------------------------------------------
+
+
 
 void PluginEditor::updateMacroAssignmentMode()
 {

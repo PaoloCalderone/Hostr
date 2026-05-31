@@ -6,6 +6,15 @@
 #include "ParallelSplitProcessor.h"
 #include "PresetManager.h"
 
+static std::unique_ptr<juce::AudioProcessor> createPluginInstanceWithFallback(
+    juce::AudioPluginFormatManager& fm,
+    const juce::KnownPluginList& knownPluginList,
+    const juce::PluginDescription& requestedDesc,
+    double sampleRate,
+    int blockSize,
+    juce::PluginDescription& loadedDesc,
+    juce::String& error);
+
 #include "ParallelSplitProcessor.cpp"
 #include "ParallelSplitComponent.cpp"
 #include "PluginSearchDialog.cpp"
@@ -643,6 +652,15 @@ static juce::PluginDescription canonicalizeDescriptionForLoad(
     juce::AudioPluginFormatManager& fm,
     const juce::KnownPluginList& knownPluginList,
     const juce::PluginDescription& desc);
+
+static std::unique_ptr<juce::AudioProcessor> createPluginInstanceWithFallback(
+    juce::AudioPluginFormatManager& fm,
+    const juce::KnownPluginList& knownPluginList,
+    const juce::PluginDescription& requestedDesc,
+    double sampleRate,
+    int blockSize,
+    juce::PluginDescription& loadedDesc,
+    juce::String& error);
 
 static void connectMainGraphAudioNodes(juce::AudioProcessorGraph& graph,
                                        juce::AudioProcessorGraph::Node& src,
@@ -1720,7 +1738,7 @@ void PluginProcessor::loadPlugin(const juce::PluginDescription& description, int
         return;
     }
 
-    const auto loadDesc = canonicalizeDescriptionForLoad(formatManager, knownPluginList, description);
+    auto loadDesc = canonicalizeDescriptionForLoad(formatManager, knownPluginList, description);
     juce::Logger::writeToLog("=== loadPlugin called ===");
     juce::Logger::writeToLog("Slot Index: " + juce::String(slotIndex));
     juce::Logger::writeToLog("Plugin: " + loadDesc.name);
@@ -1733,7 +1751,13 @@ void PluginProcessor::loadPlugin(const juce::PluginDescription& description, int
     {
         const double sr = getSampleRate() > 0.0 ? getSampleRate() : 44100.0;
         const int bs    = getBlockSize()  > 0   ? getBlockSize()  : 512;
-        instance = formatManager.createPluginInstance(loadDesc, sr, bs, error);
+        instance = createPluginInstanceWithFallback(formatManager,
+                                                   knownPluginList,
+                                                   loadDesc,
+                                                   sr,
+                                                   bs,
+                                                   loadDesc,
+                                                   error);
     }
     catch (const std::exception& e)
     {
@@ -2056,6 +2080,135 @@ static const juce::PluginDescription* findKnownPluginDescription(
     const juce::String& format,
     const juce::String& fileOrIdentifier,
     int uniqueId);
+
+static bool tryCreatePluginInstance(juce::AudioPluginFormatManager& fm,
+                                    const juce::PluginDescription& candidate,
+                                    double sampleRate,
+                                    int blockSize,
+                                    std::unique_ptr<juce::AudioProcessor>& instance,
+                                    juce::String& error)
+{
+    try
+    {
+        instance = fm.createPluginInstance(candidate, sampleRate, blockSize, error);
+    }
+    catch (const std::exception& e)
+    {
+        error = e.what();
+        instance.reset();
+    }
+    catch (...)
+    {
+        error = "Unknown exception";
+        instance.reset();
+    }
+
+    return instance != nullptr;
+}
+
+static bool findVst3DescriptionForName(juce::AudioPluginFormatManager& fm,
+                                       const juce::KnownPluginList& knownPluginList,
+                                       const juce::PluginDescription& failedDesc,
+                                       juce::PluginDescription& replacement)
+{
+    for (const auto& candidate : knownPluginList.getTypes())
+    {
+        if (candidate.pluginFormatName == "VST3"
+            && candidate.name.compareIgnoreCase(failedDesc.name) == 0
+            && candidate.fileOrIdentifier.isNotEmpty()
+            && candidate.fileOrIdentifier.endsWithIgnoreCase(".vst3"))
+        {
+            replacement = canonicalizeDescriptionForLoad(fm, knownPluginList, candidate);
+            return true;
+        }
+    }
+
+   #if JUCE_MAC
+    juce::Array<juce::File> possibleBundles;
+    possibleBundles.add(juce::File("/Library/Audio/Plug-Ins/VST3")
+                            .getChildFile(failedDesc.name + ".vst3"));
+    possibleBundles.add(juce::File::getSpecialLocation(juce::File::userHomeDirectory)
+                            .getChildFile("Library/Audio/Plug-Ins/VST3")
+                            .getChildFile(failedDesc.name + ".vst3"));
+
+    for (auto* fmt : fm.getFormats())
+    {
+        if (fmt == nullptr || fmt->getName() != "VST3")
+            continue;
+
+        for (const auto& bundle : possibleBundles)
+        {
+            if (! bundle.exists())
+                continue;
+
+            juce::OwnedArray<juce::PluginDescription> found;
+            if (! enumeratePluginTypesOnMessageThread(*fmt, bundle.getFullPathName(), found))
+                continue;
+
+            for (auto* candidate : found)
+            {
+                if (candidate != nullptr
+                    && candidate->name.compareIgnoreCase(failedDesc.name) == 0)
+                {
+                    replacement = *candidate;
+                    return true;
+                }
+            }
+
+            if (found.size() > 0 && found[0] != nullptr)
+            {
+                replacement = *found[0];
+                return true;
+            }
+        }
+    }
+   #else
+    juce::ignoreUnused(fm);
+   #endif
+
+    return false;
+}
+
+static std::unique_ptr<juce::AudioProcessor> createPluginInstanceWithFallback(
+    juce::AudioPluginFormatManager& fm,
+    const juce::KnownPluginList& knownPluginList,
+    const juce::PluginDescription& requestedDesc,
+    double sampleRate,
+    int blockSize,
+    juce::PluginDescription& loadedDesc,
+    juce::String& error)
+{
+    loadedDesc = requestedDesc;
+    std::unique_ptr<juce::AudioProcessor> instance;
+
+    if (tryCreatePluginInstance(fm, requestedDesc, sampleRate, blockSize, instance, error))
+        return instance;
+
+    juce::Logger::writeToLog("Plugin load failed for " + requestedDesc.name
+                             + " [" + requestedDesc.pluginFormatName + "]: " + error);
+
+    if (requestedDesc.pluginFormatName == "VST3")
+        return nullptr;
+
+    juce::PluginDescription vst3Desc;
+    if (! findVst3DescriptionForName(fm, knownPluginList, requestedDesc, vst3Desc))
+        return nullptr;
+
+    juce::String vst3Error;
+    if (tryCreatePluginInstance(fm, vst3Desc, sampleRate, blockSize, instance, vst3Error))
+    {
+        juce::Logger::writeToLog("Plugin load fallback succeeded: " + requestedDesc.name
+                                 + " -> VST3");
+        loadedDesc = vst3Desc;
+        error.clear();
+        return instance;
+    }
+
+    juce::Logger::writeToLog("Plugin load fallback failed for " + vst3Desc.name
+                             + " [VST3]: " + vst3Error);
+    error = error.isNotEmpty() ? error : vst3Error;
+    return nullptr;
+}
 
 static juce::PluginDescription canonicalizeDescriptionForLoad(
     juce::AudioPluginFormatManager& fm,

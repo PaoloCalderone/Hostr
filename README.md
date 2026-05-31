@@ -12,7 +12,8 @@ A JUCE audio rack for building serial chains, parallel splits, and nested routin
 ## Download Installer
 
 - [Download the latest release](https://github.com/PaoloCalderone/Hostr/releases/tag/Hostr-v1.3.1)
-- [macOS installer](https://github.com/PaoloCalderone/Hostr/releases/download/Hostr-v1.3.1/HostrMacOS.zip)
+- [macOS Arm installer](https://github.com/PaoloCalderone/Hostr/releases/download/Hostr-v1.3.1/Hostr-MacOS-Arm.zip)
+- [macOS Intel installer](https://github.com/PaoloCalderone/Hostr/releases/download/Hostr-v1.3.1/Hostr-MacOS-Intel.zip)
 - [Windows installer](https://github.com/PaoloCalderone/Hostr/releases/download/Hostr-v1.3.1/HostrWindows.zip)
 - [Linux installer](https://github.com/PaoloCalderone/Hostr/releases/download/Hostr-v1.3.1/HostrLinux.zip)
 

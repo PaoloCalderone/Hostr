@@ -89,6 +89,7 @@ public:
     // createPresetXml takes a snapshot of the current state; apply PresetXml restores it.
     juce::XmlElement* createPresetXml(const juce::String& presetName) const;
     bool              applyPresetXml (const juce::XmlElement& xml);
+    bool              applyPresetXmlInPlaceIfCompatible(const juce::XmlElement& xml);
 
     static juce::File getPresetsFolder();
     static juce::File getDefaultPresetFile();

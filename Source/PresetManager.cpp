@@ -333,6 +333,303 @@ juce::XmlElement* PresetManager::createPresetXml(const juce::String& presetName)
 }
 
 // ==============================================================================
+static const juce::XmlElement* findIndexedChild(const juce::XmlElement* parent,
+                                                const juce::String& tag,
+                                                int index)
+{
+    if (parent == nullptr)
+        return nullptr;
+
+    for (auto* child : parent->getChildIterator())
+        if (child != nullptr
+            && child->getTagName() == tag
+            && child->getIntAttribute("index", -1) == index)
+            return child;
+
+    return nullptr;
+}
+
+static bool pluginIdentityMatches(const juce::String& currentName,
+                                  const juce::String& currentFormat,
+                                  const juce::String& currentFileOrIdentifier,
+                                  int currentUniqueId,
+                                  const juce::XmlElement& slotEl)
+{
+    const auto wantedName = slotEl.getStringAttribute("pluginName");
+    const auto wantedFormat = slotEl.getStringAttribute("format");
+    const auto wantedFileOrIdentifier = slotEl.getStringAttribute("fileOrIdentifier");
+    const int wantedUniqueId = slotEl.getIntAttribute("uid", 0);
+
+    if (currentUniqueId != 0 && wantedUniqueId != 0 && currentUniqueId == wantedUniqueId)
+        return true;
+
+    if (currentFormat.isNotEmpty() && wantedFormat.isNotEmpty()
+        && currentFormat == wantedFormat
+        && currentFileOrIdentifier.isNotEmpty()
+        && wantedFileOrIdentifier.isNotEmpty()
+        && currentFileOrIdentifier == wantedFileOrIdentifier)
+        return true;
+
+    return normalisePresetPluginKey(currentName) == normalisePresetPluginKey(wantedName);
+}
+
+static bool splitTopologyMatches(const ParallelSplitProcessor& split, const juce::XmlElement& splitEl);
+
+static bool chainSlotTopologyMatches(const ParallelSplitProcessor::ChainSlotInfo& slot,
+                                     const juce::XmlElement* slotEl)
+{
+    if (slotEl == nullptr)
+        return !slot.valid;
+
+    if (!slot.valid)
+        return false;
+
+    const auto type = slotEl->getStringAttribute("type", "Plugin");
+    if (type == "ParallelSplit")
+        return slot.type == ParallelSplitProcessor::ChainSlotType::ParallelSplit
+            && slot.parallelProcessor != nullptr
+            && splitTopologyMatches(*slot.parallelProcessor, *slotEl);
+
+    return slot.type == ParallelSplitProcessor::ChainSlotType::Plugin
+        && pluginIdentityMatches(slot.name,
+                                 slot.pluginFormat,
+                                 slot.fileOrIdentifier,
+                                 slot.uniqueId,
+                                 *slotEl);
+}
+
+static bool splitTopologyMatches(const ParallelSplitProcessor& split, const juce::XmlElement& splitEl)
+{
+    int wantedChainCount = 0;
+    for (auto* chainEl : splitEl.getChildIterator())
+        if (chainEl != nullptr && chainEl->getTagName() == "Chain")
+            wantedChainCount = juce::jmax(wantedChainCount,
+                                          chainEl->getIntAttribute("index", wantedChainCount) + 1);
+
+    if (wantedChainCount != split.getNumChains())
+        return false;
+
+    for (int chainIndex = 0; chainIndex < split.getNumChains(); ++chainIndex)
+    {
+        const auto* chainEl = findIndexedChild(&splitEl, "Chain", chainIndex);
+        if (chainEl == nullptr)
+            return false;
+
+        const auto& chain = split.getChain(chainIndex);
+        for (int slotIndex = 0; slotIndex < 8; ++slotIndex)
+            if (!chainSlotTopologyMatches(chain.slots[(size_t)slotIndex],
+                                          findIndexedChild(chainEl, "Slot", slotIndex)))
+                return false;
+    }
+
+    return true;
+}
+
+static bool masterTopologyMatches(const PluginProcessor& processor, const juce::XmlElement& xml)
+{
+    const auto* slotsEl = xml.getChildByName("Slots");
+    if (slotsEl == nullptr)
+        return false;
+
+    for (int slotIndex = 0; slotIndex < 8; ++slotIndex)
+    {
+        const auto* slotEl = findIndexedChild(slotsEl, "Slot", slotIndex);
+        const auto& slot = processor.pluginSlots[(size_t)slotIndex];
+
+        if (slotEl == nullptr)
+        {
+            if (slot.isValid)
+                return false;
+            continue;
+        }
+
+        if (!slot.isValid)
+            return false;
+
+        const auto type = slotEl->getStringAttribute("type", "Plugin");
+        if (type == "ParallelSplit")
+        {
+            if (slot.type != PluginProcessor::SlotType::ParallelSplit
+                || slot.parallelProcessor == nullptr
+                || !splitTopologyMatches(*slot.parallelProcessor, *slotEl))
+                return false;
+        }
+        else if (slot.type != PluginProcessor::SlotType::Plugin
+                 || !pluginIdentityMatches(slot.name,
+                                           slot.pluginFormat,
+                                           slot.fileOrIdentifier,
+                                           slot.uniqueId,
+                                           *slotEl))
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+static void applyPluginStateFromXml(juce::AudioProcessor* processor, const juce::XmlElement& slotEl)
+{
+    if (processor == nullptr)
+        return;
+
+    if (auto* stateEl = slotEl.getChildByName("PluginState"))
+    {
+        juce::MemoryBlock mb;
+        if (mb.fromBase64Encoding(stateEl->getAllSubText().trim()))
+        {
+            try
+            {
+                processor->setStateInformation(mb.getData(), (int)mb.getSize());
+            }
+            catch (...)
+            {
+                juce::Logger::writeToLog("PresetManager: in-place setStateInformation fallito per "
+                                         + processor->getName());
+            }
+        }
+    }
+
+    if (auto* programStateEl = slotEl.getChildByName("PluginProgramState"))
+        applyPluginProgramState(processor, programStateEl->getAllSubText().trim());
+}
+
+static void applySplitInPlace(ParallelSplitProcessor& split, const juce::XmlElement& splitEl)
+{
+    for (int chainIndex = 0; chainIndex < split.getNumChains(); ++chainIndex)
+    {
+        const auto* chainEl = findIndexedChild(&splitEl, "Chain", chainIndex);
+        if (chainEl == nullptr)
+            continue;
+
+        auto& chain = split.getChain(chainIndex);
+        chain.name = chainEl->getStringAttribute("name", juce::String(chainIndex + 1));
+        chain.muted = chainEl->getBoolAttribute("muted", chainIndex > 0);
+        chain.solo = chainEl->getBoolAttribute("solo", false);
+        chain.inputGainDb = clampPresetKnobDb((float)chainEl->getDoubleAttribute("inputGainDb", 0.0));
+        chain.outputVolDb = clampPresetKnobDb((float)chainEl->getDoubleAttribute("outputVolDb", 0.0));
+
+        for (int slotIndex = 0; slotIndex < 8; ++slotIndex)
+        {
+            const auto* slotEl = findIndexedChild(chainEl, "Slot", slotIndex);
+            if (slotEl == nullptr)
+                continue;
+
+            auto& slot = chain.slots[(size_t)slotIndex];
+            const bool bypassed = slotEl->getBoolAttribute("bypassed", false);
+
+            if (slot.type == ParallelSplitProcessor::ChainSlotType::ParallelSplit
+                && slot.parallelProcessor != nullptr)
+            {
+                applySplitInPlace(*slot.parallelProcessor, *slotEl);
+                split.setSlotBypassed(chain, slotIndex, bypassed);
+                continue;
+            }
+
+            if (slot.node != nullptr)
+                applyPluginStateFromXml(slot.node->getProcessor(), *slotEl);
+
+            split.setSlotBypassed(chain, slotIndex, bypassed);
+        }
+
+        split.updateChainConnections(chain);
+    }
+}
+
+bool PresetManager::applyPresetXmlInPlaceIfCompatible(const juce::XmlElement& xml)
+{
+    if (isApplyingPreset || xml.getTagName() != "HostrPreset")
+        return false;
+
+    if (!masterTopologyMatches(processor, xml))
+        return false;
+
+    isApplyingPreset = true;
+    struct Guard { bool& flag; ~Guard() { flag = false; } } guard { isApplyingPreset };
+
+    if (auto* master = xml.getChildByName("MasterSection"))
+    {
+        processor.setInputGainDb(clampPresetKnobDb((float)master->getDoubleAttribute("inputGainDb", 0.0)), true);
+        processor.setMasterVolumeDb(clampPresetKnobDb((float)master->getDoubleAttribute("masterVolumeDb", 0.0)), true);
+        processor.setEditorZoomScale((float)master->getDoubleAttribute("editorZoom", processor.getEditorZoomScale()));
+    }
+
+    if (auto* macrosEl = xml.getChildByName("MacroControls"))
+    {
+        for (auto* macroEl : macrosEl->getChildIterator())
+        {
+            if (macroEl == nullptr || macroEl->getTagName() != "Macro")
+                continue;
+
+            const int index = macroEl->getIntAttribute("index", -1);
+            if (index < 0 || index >= PluginProcessor::macroControlCount)
+                continue;
+
+            processor.setMacroName(index, macroEl->getStringAttribute("name"));
+            processor.setMacroValue(index, (float)macroEl->getDoubleAttribute("value", 0.0));
+        }
+    }
+
+    std::vector<PluginProcessor::MacroMapping> loadedMappings;
+    if (auto* mappingsEl = xml.getChildByName("MacroMappings"))
+    {
+        for (auto* mappingEl : mappingsEl->getChildIterator())
+        {
+            if (mappingEl == nullptr || mappingEl->getTagName() != "Mapping")
+                continue;
+
+            PluginProcessor::MacroMapping mapping;
+            mapping.scope = mappingEl->getStringAttribute("scope") == "ParallelSlot"
+                ? PluginProcessor::MacroTargetScope::ParallelSlot
+                : PluginProcessor::MacroTargetScope::MasterSlot;
+            mapping.macroIndex = mappingEl->getIntAttribute("macroIndex", 0);
+            mapping.masterSlot = mappingEl->getIntAttribute("masterSlot", -1);
+            mapping.chainIndex = mappingEl->getIntAttribute("chainIndex", -1);
+            mapping.parallelSlot = mappingEl->getIntAttribute("parallelSlot", -1);
+            mapping.parameterIndex = mappingEl->getIntAttribute("parameterIndex", -1);
+            mapping.targetPath = mappingEl->getStringAttribute("targetPath");
+            mapping.pluginName = mappingEl->getStringAttribute("pluginName");
+            mapping.parameterName = mappingEl->getStringAttribute("parameterName");
+            mapping.targetMin = (float)mappingEl->getDoubleAttribute("targetMin", 0.0);
+            mapping.targetMax = (float)mappingEl->getDoubleAttribute("targetMax", 1.0);
+            mapping.inverted = mappingEl->getBoolAttribute("inverted", false);
+            mapping.enabled = mappingEl->getBoolAttribute("enabled", true);
+            loadedMappings.push_back(mapping);
+        }
+    }
+    processor.setMacroMappings(std::move(loadedMappings));
+
+    auto* slotsEl = xml.getChildByName("Slots");
+    for (int slotIndex = 0; slotIndex < 8; ++slotIndex)
+    {
+        const auto* slotEl = findIndexedChild(slotsEl, "Slot", slotIndex);
+        if (slotEl == nullptr)
+            continue;
+
+        auto& slot = processor.pluginSlots[(size_t)slotIndex];
+        const bool bypassed = slotEl->getBoolAttribute("bypassed", false);
+
+        if (slot.type == PluginProcessor::SlotType::ParallelSplit && slot.parallelProcessor != nullptr)
+        {
+            applySplitInPlace(*slot.parallelProcessor, *slotEl);
+            processor.setSlotBypassed(slotIndex, bypassed);
+            continue;
+        }
+
+        if (slot.node != nullptr)
+            applyPluginStateFromXml(slot.node->getProcessor(), *slotEl);
+
+        processor.setSlotBypassed(slotIndex, bypassed);
+    }
+
+    currentPresetName = xml.getStringAttribute("name", currentPresetName);
+    if (onPresetApplied)
+        onPresetApplied();
+
+    juce::Logger::writeToLog("PresetManager: applied compatible preset in-place");
+    return true;
+}
+
 // De-serialization — apply the XML to the PluginProcessor
 // ==============================================================================
 
@@ -568,23 +865,14 @@ bool PresetManager::applyPresetXml(const juce::XmlElement& xml)
         double sr  = processor.getSampleRate() > 0 ? processor.getSampleRate() : 44100.0;
         int    bs  = processor.getBlockSize()  > 0 ? processor.getBlockSize()  : 512;
 
-        std::unique_ptr<juce::AudioProcessor> instance;
-        try
-        {
-            instance = processor.formatManager.createPluginInstance(descCopy, sr, bs, error);
-        }
-        catch (const std::exception& ex)
-        {
-            juce::Logger::writeToLog("PresetManager: eccezione durante istanziazione di "
-                                     + descCopy.name + ": " + ex.what());
-            return nullptr;
-        }
-        catch (...)
-        {
-            juce::Logger::writeToLog("PresetManager: eccezione sconosciuta durante istanziazione di "
-                                     + descCopy.name);
-            return nullptr;
-        }
+        juce::PluginDescription loadedDesc;
+        auto instance = createPluginInstanceWithFallback(processor.formatManager,
+                                                         processor.knownPluginList,
+                                                         descCopy,
+                                                         sr,
+                                                         bs,
+                                                         loadedDesc,
+                                                         error);
 
         if (!instance)
         {
